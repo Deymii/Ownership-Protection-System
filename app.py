@@ -133,36 +133,163 @@ def mint_nft(text, owner, title):
 # Streamlit UI
 st.set_page_config(page_title="Digital Ownership Protection", page_icon="🔒", layout="wide")
 
-st.title("🔒 Digital Ownership Protection System")
-st.markdown("### Protecting Digital Ownership Using NFTs, Blockchain, and Semantic Similarity Analysis")
+# Custom CSS for dark theme and styled navigation
+st.markdown("""
+<style>
+    /* Main background and sidebar */
+    .stApp {
+        background-color: #181A18;
+    }
+    
+    [data-testid="stSidebar"] {
+        background-color: #1f2320;
+    }
+    
+    /* Hide Streamlit's default header and footer */
+    header[data-testid="stHeader"] {
+        display: none !important;
+    }
+    
+    footer {
+        display: none !important;
+    }
+    
+    #MainMenu {
+        visibility: hidden;
+    }
+    
+    /* Hide default radio button styling */
+    [data-testid="stSidebar"] .stRadio > div {
+        display: none;
+    }
+    
+    /* Remove sidebar content padding for full-width buttons */
+    [data-testid="stSidebar"] > div:first-child {
+        padding: 0 !important;
+    }
+    
+    [data-testid="stSidebar"] .block-container {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    [data-testid="stSidebar"] > div > div > div {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    [data-testid="stSidebar"] .stButton {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Sidebar button styling - full width, flat design */
+    [data-testid="stSidebar"] .stButton > button {
+        width: 100% !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 18px 25px !important;
+        margin: 0 !important;
+        text-align: left !important;
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+    
+    /* Secondary (unselected) buttons */
+    [data-testid="stSidebar"] .stButton > button[kind="secondary"] {
+        background-color: transparent;
+        color: #888888;
+    }
+    
+    [data-testid="stSidebar"] .stButton > button[kind="secondary"]:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #cccccc;
+    }
+    
+    /* Primary (selected) buttons - subtle white */
+    [data-testid="stSidebar"] .stButton > button[kind="primary"] {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        border-left: 3px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Threshold slider styling */
+    .threshold-container {
+        background-color: #2a2d2a;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #ff4444;
+        margin: 10px 0;
+    }
+    
+    .threshold-label {
+        color: #ff4444;
+        font-weight: bold;
+        font-size: 14px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Sidebar
-st.sidebar.header("Navigation")
-page = st.sidebar.radio("Go to", ["Submit Content", "View Ownership Records", "System Statistics"])
+# Sidebar with Navigation header
+st.sidebar.markdown("## 🧭 Navigation")
+st.sidebar.markdown("---")
 
-# Similarity threshold setting
-threshold = st.sidebar.slider("Similarity Threshold", 0.5, 1.0, 0.85, 0.05)
-st.sidebar.info(f"Content with similarity ≥ {threshold:.0%} will be rejected")
+# Initialize session state for page navigation
+if 'current_page' not in st.session_state:
+    st.session_state.current_page = "Dashboard"
+
+# Navigation with styled buttons
+pages = ["Dashboard", "Submit Content", "View Records"]
+
+for page_name in pages:
+    # Determine button style based on current page
+    is_active = st.session_state.current_page == page_name
+    
+    if st.sidebar.button(
+        f"{'📊' if page_name == 'Dashboard' else '📝' if page_name == 'Submit Content' else '📋'} {page_name}",
+        key=f"nav_{page_name}",
+        use_container_width=True,
+        type="primary" if is_active else "secondary"
+    ):
+        st.session_state.current_page = page_name
+        st.rerun()
+
+page = st.session_state.current_page
+
+# Default threshold value
+threshold = 0.85
 
 if page == "Submit Content":
-    st.header("📝 Submit Your Content")
+    st.markdown("<h1 style='text-align: center;'>&#128274; Digital Ownership Protection System</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns([2, 1])
+    # Centered form container
+    col_left, col_center, col_right = st.columns([1, 2, 1])
     
-    with col1:
+    with col_center:
         owner_name = st.text_input("Your Name", placeholder="Enter your name")
         content_title = st.text_input("Content Title", placeholder="Enter a title for your content")
         content_text = st.text_area("Content", placeholder="Paste or type your content here...", height=300)
         
-        submit_button = st.button("🔍 Check Originality & Mint NFT", type="primary")
-    
-    with col2:
-        st.info("**How it works:**\n\n"
-                "1. Enter your details\n"
-                "2. Submit your content\n"
-                "3. System checks originality\n"
-                "4. If original, NFT is minted\n"
-                "5. Ownership is recorded")
+        # Similarity threshold with red styling
+        st.markdown("""
+        <div class="threshold-container">
+            <span class="threshold-label">⚠️ SIMILARITY THRESHOLD</span>
+        </div>
+        """, unsafe_allow_html=True)
+        threshold = st.slider("Content with similarity above this threshold will be rejected", 0.5, 1.0, 0.85, 0.05)
+        st.markdown(f"**Current threshold: {threshold:.0%}**")
+        
+        # Centered button
+        st.markdown("<div style='display: flex; justify-content: center;'>", unsafe_allow_html=True)
+        submit_button = st.button("🔍 Check Originality", type="primary", use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
     
     if submit_button:
         if not owner_name or not content_title or not content_text:
@@ -178,8 +305,8 @@ if page == "Submit Content":
                     
                     with st.spinner("Minting NFT..."):
                         nft_hash, content_hash = mint_nft(content_text, owner_name, content_title)
-                        
-                    st.balloons()
+                    
+                    # Removed balloons effect
                     st.success("🎉 NFT Successfully Minted!")
                     
                     st.markdown("### 📜 Your Ownership Certificate")
@@ -205,7 +332,7 @@ if page == "Submit Content":
                             st.markdown(f"**Matched Content Hash:** {matched_content['Content_Hash']}")
                             st.markdown(f"**Registered on:** {matched_content['Timestamp']}")
 
-elif page == "View Ownership Records":
+elif page == "View Records":
     st.header("📋 Ownership Records")
     
     if os.path.exists(OWNERSHIP_FILE):
@@ -241,44 +368,110 @@ elif page == "View Ownership Records":
     else:
         st.info("No ownership records found. Submit content to get started!")
 
-elif page == "System Statistics":
-    st.header("📊 System Statistics")
+elif page == "Dashboard":
+    st.header("📊 Dashboard")
     
     if os.path.exists(OWNERSHIP_FILE) and os.path.exists(CONTENT_FILE):
         ownership_df = pd.read_csv(OWNERSHIP_FILE)
         content_df = pd.read_csv(CONTENT_FILE)
         
-        col1, col2, col3 = st.columns(3)
+        # Visual metrics with colored cards
+        col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            st.metric("Total Registered Content", len(ownership_df))
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #4CAF50, #2E7D32); padding: 20px; border-radius: 15px; text-align: center;">
+                <h2 style="color: white; margin: 0;">📄</h2>
+                <h1 style="color: white; margin: 10px 0;">{}</h1>
+                <p style="color: #E8F5E9; margin: 0;">Total Content</p>
+            </div>
+            """.format(len(ownership_df)), unsafe_allow_html=True)
         
         with col2:
             unique_owners = ownership_df['Owner'].nunique() if len(ownership_df) > 0 else 0
-            st.metric("Unique Owners", unique_owners)
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #2196F3, #1565C0); padding: 20px; border-radius: 15px; text-align: center;">
+                <h2 style="color: white; margin: 0;">👥</h2>
+                <h1 style="color: white; margin: 10px 0;">{}</h1>
+                <p style="color: #E3F2FD; margin: 0;">Unique Owners</p>
+            </div>
+            """.format(unique_owners), unsafe_allow_html=True)
         
         with col3:
             total_size = len(content_df)
-            st.metric("Database Size", f"{total_size} records")
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #FF9800, #EF6C00); padding: 20px; border-radius: 15px; text-align: center;">
+                <h2 style="color: white; margin: 0;">💾</h2>
+                <h1 style="color: white; margin: 10px 0;">{}</h1>
+                <p style="color: #FFF3E0; margin: 0;">Database Records</p>
+            </div>
+            """.format(total_size), unsafe_allow_html=True)
         
-        if len(ownership_df) > 0:
-            st.markdown("### Recent Registrations")
-            recent_df = ownership_df.sort_values('Timestamp', ascending=False).head(5)
-            st.dataframe(recent_df[['Title', 'Owner', 'Timestamp']], use_container_width=True)
+        with col4:
+            # Calculate today's registrations
+            today = datetime.now().strftime('%Y-%m-%d')
+            if len(ownership_df) > 0:
+                today_count = len(ownership_df[ownership_df['Timestamp'].str.contains(today, na=False)])
+            else:
+                today_count = 0
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #9C27B0, #6A1B9A); padding: 20px; border-radius: 15px; text-align: center;">
+                <h2 style="color: white; margin: 0;">📅</h2>
+                <h1 style="color: white; margin: 10px 0;">{}</h1>
+                <p style="color: #F3E5F5; margin: 0;">Today's Registrations</p>
+            </div>
+            """.format(today_count), unsafe_allow_html=True)
         
-        st.markdown("### System Information")
-        st.info(f"**Model:** MiniLM (all-MiniLM-L6-v2)\n\n"
-                f"**Similarity Algorithm:** Cosine Similarity\n\n"
-                f"**Blockchain Simulation:** CSV-based storage\n\n"
-                f"**Current Threshold:** {threshold:.0%}")
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Two column layout for charts and recent activity
+        chart_col, activity_col = st.columns([1.5, 1])
+        
+        with chart_col:
+            st.markdown("### 📈 Registration Activity")
+            if len(ownership_df) > 0:
+                # Create a simple bar chart of registrations by date
+                ownership_df['Date'] = pd.to_datetime(ownership_df['Timestamp']).dt.date
+                daily_counts = ownership_df.groupby('Date').size().reset_index(name='Count')
+                daily_counts = daily_counts.tail(7)  # Last 7 days
+                st.bar_chart(daily_counts.set_index('Date')['Count'])
+            else:
+                st.info("No data to display yet.")
+        
+        with activity_col:
+            st.markdown("### 🕐 Recent Registrations")
+            if len(ownership_df) > 0:
+                recent_df = ownership_df.sort_values('Timestamp', ascending=False).head(5)
+                for idx, row in recent_df.iterrows():
+                    st.markdown(f"""
+                    <div style="background: #2a2d2a; padding: 10px 15px; border-radius: 8px; margin: 5px 0; border-left: 3px solid #4CAF50;">
+                        <strong style="color: #4CAF50;">{row['Title'][:30]}{'...' if len(row['Title']) > 30 else ''}</strong><br>
+                        <small style="color: #888;">by {row['Owner']}</small>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("No recent registrations.")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # System info in a nice card
+        st.markdown("### ⚙️ System Information")
+        sys_col1, sys_col2 = st.columns(2)
+        
+        with sys_col1:
+            st.markdown("""
+            <div style="background: #2a2d2a; padding: 20px; border-radius: 10px;">
+                <p><strong>🤖 Model:</strong> MiniLM (all-MiniLM-L6-v2)</p>
+                <p><strong>📐 Algorithm:</strong> Cosine Similarity</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with sys_col2:
+            st.markdown("""
+            <div style="background: #2a2d2a; padding: 20px; border-radius: 10px;">
+                <p><strong>🔗 Storage:</strong> CSV-based simulation</p>
+                <p><strong>🎯 Default Threshold:</strong> 85%</p>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        st.info("No data available yet.")
-
-# Footer
-st.markdown("---")
-st.markdown("""
-<div style='text-align: center'>
-    <p>Developed by Zeyad Sabri Ali & Abdalrahman Muhammad Ali Alahmad</p>
-    <p>Supervised by Dr. Abed Alanazi | Prince Sattam bin Abdulaziz University</p>
-</div>
-""", unsafe_allow_html=True)
+        st.info("No data available yet. Start by submitting content!")
