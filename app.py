@@ -25,7 +25,7 @@ def initialize_files():
         df = pd.DataFrame(columns=['NFT_Hash', 'Owner', 'Title', 'Timestamp', 'Content_Hash'])
         df.to_csv(OWNERSHIP_FILE, index=False)
     
-    if not os.path.exists(CONTENT_FILE):
+    if not os.path.exists(CONTENT_FILE): 
         df = pd.DataFrame(columns=['Content_Hash', 'Content', 'Embedding', 'Timestamp'])
         df.to_csv(CONTENT_FILE, index=False)
 
@@ -145,9 +145,22 @@ st.markdown("""
         background-color: #1f2320;
     }
     
-    /* Hide Streamlit's default header and footer */
+    /* Hide Streamlit's default header content but keep sidebar toggle */
     header[data-testid="stHeader"] {
-        display: none !important;
+        background: transparent !important;
+        height: auto !important;
+    }
+    
+    /* Keep sidebar collapse button visible */
+    [data-testid="stSidebarCollapseButton"] {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    /* Ensure collapsed sidebar button is visible */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: block !important;
+        visibility: visible !important;
     }
     
     footer {
